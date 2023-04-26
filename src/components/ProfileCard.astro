@@ -1,0 +1,19 @@
+---
+import Card from "./Card.astro";
+
+export interface Props {
+  displayName?: string;
+  avatar?: string;
+  description?: string;
+}
+
+const { displayName, avatar, description } = Astro.props;
+---
+
+<Card>
+  <h1 class="font-bold mb-3">{displayName}</h1>
+  <div class="grid grid-cols-2 gap-2">
+    <img class="w-full" src={avatar} />
+    <p>{description}</p>
+  </div>
+</Card>

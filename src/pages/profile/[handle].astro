@@ -1,0 +1,76 @@
+---
+import { BskyAgent } from "@atproto/api";
+import ProfileCard from "../../components/ProfileCard.astro";
+import ContactCard from "../../components/ContactCard.astro";
+import Layout from "../../layouts/Layout.astro";
+import Friends from "../../components/Friends.astro";
+import Card from "../../components/Card.astro";
+
+const { handle } = Astro.params;
+
+// FIXME: this should be replaced with server data soon
+const customProfile = await Astro.glob(`../../../content/profiles/*.md`).then(
+  (px) => px.find((p) => p.file.includes(handle!)),
+);
+
+const agent = new BskyAgent({
+  service: "https://bsky.social",
+});
+
+await agent.login({
+  identifier: import.meta.env.BSKY_USERNAME!,
+  password: import.meta.env.BSKY_PASSWORD!,
+});
+
+const profile = await agent
+  .getProfile({
+    actor: handle!,
+  })
+  .then((p) => p.data);
+
+const topEight = customProfile?.frontmatter.topEight || [];
+
+const theme = customProfile?.frontmatter.theme || { colors: {} }
+
+const Content = customProfile?.Content;
+---
+
+<Layout title={profile.displayName!}>
+  <div class="bg-background text-text border-border h-full">
+    <div class="grid grid-cols-2 gap-x-4 container mx-auto py-6">
+      <div class="flex flex-col gap-y-4 bg-background">
+        <ProfileCard
+          displayName={profile.displayName}
+          avatar={profile.avatar}
+          description={profile.description}
+        />
+        <ContactCard displayName={profile.displayName} />
+        <Card>
+          Bluesky Handle:
+          {profile.handle}
+        </Card>
+        <Card>
+          <pre
+            class="text-sm overflow-x-scroll">
+{JSON.stringify(profile, null, 2)}
+        </pre>
+        </Card>
+      </div>
+      <div class="flex flex-col gap-y-4">
+        {customProfile && <Card>
+          <!-- <h3 class="text-text">{profile.displayName}’s Blurbs</h3> -->
+          {customProfile && <Content />}
+        </Card>}
+
+        {customProfile && <Friends data={profile} topEight={topEight} />}
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style
+  is:global
+  define:vars={{
+    ...theme.colors,
+  }}
+></style>

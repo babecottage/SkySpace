@@ -1,0 +1,39 @@
+---
+import { BskyAgent } from "@atproto/api";
+import Card from "./Card.astro";
+const agent = new BskyAgent({
+  service: "https://bsky.social",
+});
+
+await agent.login({
+  identifier: import.meta.env.BSKY_USERNAME!,
+  password: import.meta.env.BSKY_PASSWORD!,
+});
+
+const topEight = await agent
+  .getProfiles({
+    actors: Astro.props.topEight,
+  })
+  .then((r) => r.data.profiles);
+---
+
+<Card>
+  <h3>{Astro.props.data.displayName}’s Friend Space</h3>
+  <p>
+    {Astro.props.data.displayName} has {Astro.props.data.followersCount} friends
+  </p>
+  <ul class="grid grid-cols-4 gap-3">
+    {
+      topEight.map((profile) => {
+        return (
+          <li>
+            <a href={`/profile/${profile.handle}`}>
+              <h3>{profile.displayName}</h3>
+              <img src={profile.avatar} />
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</Card>

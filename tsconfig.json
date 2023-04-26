@@ -1,3 +1,10 @@
 {
-  "extends": "astro/tsconfigs/strict"
+  "extends": "astro/tsconfigs/strict",
+  "buildOptions": {
+    "paths": {
+      "@components/*": "./src/components/*",
+      "@layouts/*": "./src/layouts/*",
+      "@content/*": "./src/content/*"
+    }
+  }
 }
