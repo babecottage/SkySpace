@@ -23,4 +23,4 @@ as a gemini sun & enneagram 7 with extreeeeme ADHD, she thrives on prototyping e
 
 she wrote her first websites in elementary school in notepad (and distributed them via floppy disk: long story), started writing react the day of the public release, and was working on generative AI design tooling back when AI was in black & white
 
-she's available for part-time/flexible skunkworks projects one last time before the robots take over for good ~ [foo](hireme at jem dot fm)
+she's available for part-time/flexible skunkworks projects one last time before the robots take over for good ~ <span class="whitespace-nowrap">hireme at jem dot fm</span>
