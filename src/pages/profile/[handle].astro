@@ -1,5 +1,7 @@
 ---
-import { BskyAgent } from "@atproto/api";
+import pkg from '@atproto/api'
+const { BskyAgent } = pkg
+
 import ProfileCard from "../../components/ProfileCard.astro";
 import ContactCard from "../../components/ContactCard.astro";
 import Layout from "../../layouts/Layout.astro";
@@ -13,7 +15,6 @@ const customProfile = await Astro.glob('/content/profiles/*.md').then(
   (px) => {console.log(px[0].file); return px.find((p) => p.file.includes(handle!))}
 );
 
-console.log(customProfile)
 
 const agent = new BskyAgent({
   service: "https://bsky.social",
@@ -34,7 +35,6 @@ const topEight = customProfile?.frontmatter.topEight || [];
 
 const theme = customProfile?.frontmatter.theme || { colors: {} }
 
-const Content = customProfile?.Content;
 ---
 
 <Layout title={profile.displayName!}>

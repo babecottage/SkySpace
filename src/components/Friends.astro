@@ -1,5 +1,7 @@
 ---
-import { AtpSessionData, AtpSessionEvent, BskyAgent } from "@atproto/api";
+import pkg from "@atproto/api";
+const { BskyAgent } = pkg;
+
 import Card from "./Card.astro";
 const agent = new BskyAgent({
   service: "https://bsky.social",
