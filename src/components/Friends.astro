@@ -1,6 +1,7 @@
 ---
-import pkg from "@atproto/api";
-const { BskyAgent } = pkg;
+// @ts-ignore
+import { ATP } from "../utils/atp";
+const { BskyAgent } = ATP;
 
 import Card from "./Card.astro";
 const agent = new BskyAgent({
