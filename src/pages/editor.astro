@@ -1,0 +1,24 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { agent } from "@/lib/atp";
+
+const data = await localStorage.getItem("session");
+
+console.log(data);
+
+if (!data) {
+  // return Astro.redirect("/login");
+} else {
+  try {
+    await agent.resumeSession(JSON.parse(data));
+  } catch (e) {
+    return Astro.redirect("/login");
+  }
+}
+---
+
+<Layout title="Editor">
+  <div class="container mx-auto">
+    <h1>Editor</h1>
+  </div>
+</Layout>
