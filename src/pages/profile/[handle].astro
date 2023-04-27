@@ -9,9 +9,11 @@ import Card from "../../components/Card.astro";
 const { handle } = Astro.params;
 
 // FIXME: this should be replaced with server data soon
-const customProfile = await Astro.glob(`../../../content/profiles/*.md`).then(
-  (px) => px.find((p) => p.file.includes(handle!)),
+const customProfile = await Astro.glob('/content/profiles/*.md').then(
+  (px) => {console.log(px[0].file); return px.find((p) => p.file.includes(handle!))}
 );
+
+console.log(customProfile)
 
 const agent = new BskyAgent({
   service: "https://bsky.social",
@@ -36,33 +38,33 @@ const Content = customProfile?.Content;
 ---
 
 <Layout title={profile.displayName!}>
-  <div class="bg-background text-text border-border h-full">
+  <div class="text-text border-border bg-pageBackground font-mono h-full">
     <div class="grid grid-cols-2 gap-x-4 container mx-auto py-6">
-      <div class="flex flex-col gap-y-4 bg-background">
+      <div class="flex flex-col gap-y-4">
         <ProfileCard
           displayName={profile.displayName}
           avatar={profile.avatar}
           description={profile.description}
         />
-        <ContactCard displayName={profile.displayName} />
+        <!-- <ContactCard displayName={profile.displayName} /> -->
         <Card>
           Bluesky Handle:
           {profile.handle}
         </Card>
-        <Card>
-          <pre
-            class="text-sm overflow-x-scroll">
-{JSON.stringify(profile, null, 2)}
-        </pre>
-        </Card>
+          <Card>
+            <pre
+              class="text-sm overflow-x-scroll">
+  {JSON.stringify(profile, null, 2)}
+          </pre>
+          </Card>
       </div>
       <div class="flex flex-col gap-y-4">
         {customProfile && <Card>
           <!-- <h3 class="text-text">{profile.displayName}’s Blurbs</h3> -->
-          {customProfile && <Content />}
+          <customProfile.Content />
         </Card>}
 
-        {customProfile && <Friends data={profile} topEight={topEight} />}
+        {customProfile && <Friends data={profile} topEight={topEight || []} />}
       </div>
     </div>
   </div>
@@ -73,4 +75,8 @@ const Content = customProfile?.Content;
   define:vars={{
     ...theme.colors,
   }}
-></style>
+>
+.bg-pageBackground {
+  background: var(--pageBackground);
+}
+</style>
