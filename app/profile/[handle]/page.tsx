@@ -124,7 +124,8 @@ export default async function ProfilePage({
                 <h3 className="text-text">{profile.displayName}’s Blurbs</h3>
                 {!!markdown && <MarkdownRenderer {...markdown} />}
               </Card>
-
+              {/* https://beta.nextjs.org/docs/configuring/typescript#async-server-component-typescript-error  */}
+              {/* @ts-expect-error Async Server Component */}
               <Friends profile={profile} topEight={topEight} />
             </div>
           </div>
