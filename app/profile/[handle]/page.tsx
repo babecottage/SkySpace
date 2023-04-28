@@ -64,15 +64,16 @@ export default async function ProfilePage({
   const profile = await getProfile(handle);
   let markdown: Markdown<ProfileFrontmatter> | undefined;
   try {
-    markdown = await getProfileExtra(handle);
+    markdown = (await getProfileExtra(handle)) as Markdown<ProfileFrontmatter>;
   } catch (error) {
     console.error(error);
   }
 
-  const topEight = [];
   const theme = markdown?.frontmatter?.theme || {
     colors: {},
   };
+
+  const topEight = markdown?.frontmatter.topEight || [];
 
   const vars = themeColorsToVars(theme.colors);
 
@@ -124,7 +125,7 @@ export default async function ProfilePage({
                 {!!markdown && <MarkdownRenderer {...markdown} />}
               </Card>
 
-              <Friends profile={profile} topEight={topEight || []} />
+              <Friends profile={profile} topEight={topEight} />
             </div>
           </div>
         </div>
