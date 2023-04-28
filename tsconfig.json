@@ -1,10 +1,26 @@
 {
-  "extends": "astro/tsconfigs/strict",
-  "buildOptions": {
-    "paths": {
-      "@components/*": "./src/components/*",
-      "@layouts/*": "./src/layouts/*",
-      "@content/*": "./src/content/*"
-    }
-  }
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "baseUrl": ".",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "strictNullChecks": true
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }
