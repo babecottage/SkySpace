@@ -1,33 +1,28 @@
-import { BskyAgent } from "@atproto/api";
 import { Card } from "components/Card";
 import { ContactCard } from "components/ContactCard";
 import { Friends } from "components/Friends";
+import { MarkdownRenderer } from "components/MarkdownRenderer";
 import { ProfileCard } from "components/ProfileCard";
+
+import { getProfile } from "lib/atp.server";
+import { getMDXByPath } from "lib/mdx.server";
+import type { ProfileFrontmatter } from "lib/types";
+import { Metadata } from "next";
 
 export const dynamicParams = true;
 export const revalidate = 3600; // revalidate every hour
 
-// https://beta.nextjs.org/docs/data-fetching/fetching#data-fetching-without-fetch
-const getProfile = async (handle: string) => {
-  const agent = new BskyAgent({
-    service: "https://bsky.social",
-  });
+const getProfileExtra = async (handle: string) => {
+  try {
+    const mdx = await getMDXByPath<ProfileFrontmatter>(
+      `/profiles/${handle}.mdx`,
+    );
 
-  await agent.login({
-    identifier: process.env.BSKY_USERNAME!,
-    password: process.env.BSKY_PASSWORD!,
-  });
-
-  const res = await agent.getProfile({
-    actor: handle,
-  });
-
-  if (!res.success) {
-    throw new Error("Could not get profile");
+    return mdx;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Could not get extra profile data");
   }
-  const { data: profile } = res;
-
-  return profile;
 };
 
 const themeColorsToVars = (colors: {
@@ -41,23 +36,42 @@ const themeColorsToVars = (colors: {
   }, {});
 };
 
+export async function generateMetadata({
+  params: { handle },
+}: ProfilePageProps): Promise<Metadata> {
+  const profile = await getProfile(handle);
+
+  return {
+    title: `${profile.displayName} (@${profile.handle}): SkySpace`,
+    description: profile.description,
+  };
+}
+
+type ProfilePageProps = {
+  params: {
+    handle: string;
+  };
+};
+
+type Markdown<T> = {
+  code: string;
+  frontmatter: T;
+};
+
 export default async function ProfilePage({
   params: { handle },
-}: {
-  params: { handle: string };
-}) {
+}: ProfilePageProps) {
   const profile = await getProfile(handle);
-  // const profile = {};
+  let markdown: Markdown<ProfileFrontmatter> | undefined;
+  try {
+    markdown = await getProfileExtra(handle);
+  } catch (error) {
+    console.error(error);
+  }
 
   const topEight = [];
-  const theme = {
-    colors: {
-      pageBackground:
-        "linear-gradient(180deg, #321870 13.54%, #FE9ABC 46.35%, #FE9ABC 48.96%, #FC8117 54.17%, #F1BD03 83.33%)",
-      background: "#321870",
-      border: "#C478FF",
-      text: "#C478FF",
-    },
+  const theme = markdown?.frontmatter?.theme || {
+    colors: {},
   };
 
   const vars = themeColorsToVars(theme.colors);
@@ -84,15 +98,30 @@ export default async function ProfilePage({
                 {profile.handle}
               </Card>
               <Card>
-                <pre className="text-sm overflow-x-scroll">
-                  {JSON.stringify(profile, null, 2)}
-                </pre>
+                <table className="overflow-hidden table-fixed text-sm w-full">
+                  <tbody>
+                    {Object.entries(theme.colors).map(([key, value]) => (
+                      <tr key={key}>
+                        <td className="font-bold pr-3">{key}</td>
+                        <td className="p-2 rounded-sm">
+                          <div
+                            className="h-10 w-full rounded-sm overflow-hidden border"
+                            style={{
+                              background: value,
+                            }}
+                          ></div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </Card>
             </div>
 
             <div className="flex flex-col col-span-2 gap-y-4">
               <Card>
                 <h3 className="text-text">{profile.displayName}’s Blurbs</h3>
+                {!!markdown && <MarkdownRenderer {...markdown} />}
               </Card>
 
               <Friends profile={profile} topEight={topEight || []} />
