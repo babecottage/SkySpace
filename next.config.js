@@ -5,6 +5,7 @@
  **/
 const nextConfig = {
   experimental: {
+    typedRoutes: true,
     appDir: true,
   },
   /* config options here */
